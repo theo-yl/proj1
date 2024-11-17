@@ -181,7 +181,6 @@ student_id = 0;
         % compare two random bit sequences).
         ber = 1-sum(rx == tx)/length(rx); 
     end
-
 % done and understood until here 
 
     function txFrame = concat_packages(txPilot,txData)
@@ -191,7 +190,7 @@ student_id = 0;
         if(length(txData) ~= length(txPilot))
             error('Pilot and data are not of the same length!');
         end
-        txFrame = 0; %TODO: This line is missing some code!
+        txFrame = [txPilot ; txData]; %TODO: This line is missing some code!
     end
 
     function [rxPilot, rxData] = split_frame(rxFrame)
@@ -201,8 +200,8 @@ student_id = 0;
             error('Vector z must have an even number of elements'); 
         end
         N = length(rxFrame);
-        rxPilot = 0; %TODO: This line is missing some code!
-        rxData = 0; %TODO: This line is missing some code!
+        rxPilot = rxFrame(1:N/2); %TODO: This line is missing some code!
+        rxData = rxFrame(N/2+1:end); %TODO: This line is missing some code!
     end
 
     function [rx, evm, ber, symbs] = sim_ofdm_unknown_channel(tx, h, N_cp, snr, sync_err)
@@ -261,8 +260,8 @@ student_id = 0;
         h = h(:);
         
         % Convert bits to QPSK symbols
-        x.p = 0; %TODO: This line is missing some code!
-        x.d = 0; %TODO: This line is missing some code!
+        x.p = bits2qpsk(tx.p); %TODO: This line is missing some code!
+        x.d = bits2qpsk(tx.d); %TODO: This line is missing some code!
 
         symbs.tx = x.d;   % Store transmitted data symbols for later
 
@@ -273,15 +272,15 @@ student_id = 0;
         end
 
         % Create OFDM time-domain block using IDFT
-        z.p = 0; %TODO: This line is missing some code!
-        z.d = 0; %TODO: This line is missing some code!
+        z.p = ifft(x.p); %TODO: This line is missing some code!
+        z.d = ifft(x.d); %TODO: This line is missing some code!
 
         % Add cyclic prefix to create OFDM package
-        zcp.p = 0; %TODO: This line is missing some code!
-        zcp.d = 0; %TODO: This line is missing some code!
+        zcp.p = add_cyclic_prefix(z.p,N_cp); %TODO: This line is missing some code!
+        zcp.d = add_cyclic_prefix(z.d,N_cp); %TODO: This line is missing some code!
         
         % Concatenate the messages
-        tx_frame = 0; %TODO: This line is missing some code!
+        tx_frame = concat_packages(zcp.p, zcp.d); %TODO: This line is missing some code!
 
         % Send package over channel
         rx_frame = simulate_baseband_channel(tx_frame, h, snr, sync_err);
@@ -290,22 +289,22 @@ student_id = 0;
         
         % Split frame into packages
         ycp = struct();
-        [ycp.p, ycp.d] = 0; %TODO: This line is missing some code!
+        [ycp.p, ycp.d] = split_frame(ycp); %TODO: This line is missing some code!
         
         % Remove cyclic prefix
-        y.p = 0; %TODO: This line is missing some code!
-        y.d = 0; %TODO: This line is missing some code!
+        y.p = remove_cyclic_prefix(ycp.p,N_cp); %TODO: This line is missing some code!
+        y.d = remove_cyclic_prefix(ycp.d,N_cp); %TODO: This line is missing some code!
 
         % Convert to frequency domain using DFT
-        r.p = 0; %TODO: This line is missing some code!
-        r.d = 0; %TODO: This line is missing some code!
+        r.p = fft(y.p); %TODO: This line is missing some code!
+        r.d = fft(y.d); %TODO: This line is missing some code!
         symbs.rx_pe = r.d; % Store symbols for later
         
         % Esimate channel
-        H = 0; %TODO: This line is missing some code!
+        H = r.p/x.p; %TODO: This line is missing some code!
 
         % Remove effect of channel on the data package by equalization.
-        r_eq = 0; %TODO: This line is missing some code!
+        r_eq = r.d./H; %TODO: This line is missing some code!
 
         symbs.rx_e = r_eq; %Store symbols for later
 
@@ -314,7 +313,7 @@ student_id = 0;
         evm = norm(x.d - r_eq)/sqrt(N);
 
         % Convert the recieved symsbols to bits
-        rx = 0; %TODO: This line is missing some code!
+        rx = qpsk2bits(r_eq); %TODO: This line is missing some code!
 
         % Calculate the bit error rate (BER).
         % This indicates the relative number of bit errors.
@@ -323,7 +322,7 @@ student_id = 0;
         % compare two random bit sequences).
         ber = 1-sum(rx == tx.d)/length(rx); 
     end
-
+% done until here 
     function z = frame_interpolate(x,L,hlp)
         % Interpolate (upsample) a signal x by factor L, with an optionally
         % configurable lowpass filter.
@@ -355,10 +354,10 @@ student_id = 0;
         
         % Upsample by a factor L, i.e. insert L-1 zeros after each original
         % sample
-        zup(1:L:end) = 0; %TODO: This line is missing some code!
+        zup(1:L:end) = ; %TODO: This line is missing some code!
         
         % Apply the LP filter to the upsampled (unfiltered) signal.
-        z = 0; %TODO: This line is missing some code!
+        z = ; %TODO: This line is missing some code!
     end
 
     function z = frame_decimate(x,L,hlp)
