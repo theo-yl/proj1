@@ -182,6 +182,8 @@ student_id = 0;
         ber = 1-sum(rx == tx)/length(rx); 
     end
 
+% done and understood until here 
+
     function txFrame = concat_packages(txPilot,txData)
         % Concatenate two ofdm blocks of equal size into a frame
         txPilot = txPilot(:);
